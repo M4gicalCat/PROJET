@@ -25,19 +25,17 @@ class Router
         if (str_ends_with($path, "/")) {
             $path = substr($path, 0, -1);
         }
-        echo $path;
         foreach ($this->routes as $route => $cb) {
-            echo "route: ".$route." | path: ".$path."\n";
             if ($route === $path) {
                 if (authenticate() < $cb["auth"]) {
-                    echo json_encode(["message" => "You are not allowed to access this resource", "code" => 401]);
+                    echo json_encode(["message" => "You are not allowed to access this resource", "code" => 401, "err" => true]);
                     exit();
                 }
-                $cb["cb"]();
+                $cb["cb"](json_decode(file_get_contents('php://input'), true));
                 exit();
             }
         }
-        echo json_encode(["message" => "Cette ressource n'existe pas", "code" => 404]);
+        echo json_encode(["message" => "Cette ressource n'existe pas", "code" => 404, "err" => true]);
     }
 }
 

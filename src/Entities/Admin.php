@@ -21,7 +21,7 @@ class Admin
         return new self($username, $password);
     }
 
-    public static function find(string $username): self
+    public static function find(?string $username = "___not found"): self | null
     {
         $db = PdoConnexion::getConnexion();
         $query = $db->prepare("SELECT * FROM admin WHERE username = :username");
@@ -29,6 +29,9 @@ class Admin
             "username" => $username
         ]);
         $result = $query->fetch();
+        if ($result === false) {
+            return null;
+        }
         return new self($result["username"], $result["password"]);
     }
 
