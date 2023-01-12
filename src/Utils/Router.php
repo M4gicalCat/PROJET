@@ -30,14 +30,14 @@ class Router
             echo "route: ".$route." | path: ".$path."\n";
             if ($route === $path) {
                 if (authenticate() < $cb["auth"]) {
-                    echo json_encode(["error" => "You are not allowed to access this resource"]);
+                    echo json_encode(["message" => "You are not allowed to access this resource", "code" => 401]);
                     exit();
                 }
                 $cb["cb"]();
                 exit();
             }
         }
-        echo "404";
+        echo json_encode(["message" => "Cette ressource n'existe pas", "code" => 404]);
     }
 }
 
