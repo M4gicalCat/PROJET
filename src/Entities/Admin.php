@@ -32,18 +32,16 @@ class Admin
         return new self($result["username"], $result["password"]);
     }
 
-    public function update(string $username, string $password): self
+    public static function update(string $old_username, array $new): self
     {
         $db = PdoConnexion::getConnexion();
         $query = $db->prepare("UPDATE admin SET username = :username, password = :password WHERE username = :oldUsername");
         $query->execute([
-            "username" => $username,
-            "password" => $password,
-            "oldUsername" => $this->username
+            "username" => $new["username"],
+            "password" => $new["password"],
+            "oldUsername" => $old_username
         ]);
-        $this->username = $username;
-        $this->password = $password;
-        return $this;
+        return new self($new["username"], $new["password"]);
     }
 
     public function delete(): void
@@ -64,6 +62,19 @@ class Admin
         return $query->fetchColumn();
     }
 
+    public static function findAll(): array
+    {
+        $db = PdoConnexion::getConnexion();
+        $query = $db->prepare("SELECT * FROM admin");
+        $query->execute();
+        $result = $query->fetchAll();
+        $admins = [];
+        foreach ($result as $admin) {
+            $admins[] = new self($admin["username"], $admin["password"]);
+        }
+        return $admins;
+    }
+
     /**
      * @return string
      */
@@ -78,5 +89,13 @@ class Admin
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function public(): array
+    {
+        return [
+            "username" => $this->username,
+            "password" => $this->password
+        ];
     }
 }

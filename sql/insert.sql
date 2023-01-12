@@ -4,4 +4,4 @@ insert into theme values (NULL, 'thème 1'), (NULL, 'thème 2'), (NULL, 'thème 
 
 insert into inscription values (NULL, 'email@example.com'), (NULL, 'truc@machin.com'), (NULL, 'etudiant@univ.fr');
 
-insert into theme_inscription values (NULL, 3, 1), (NULL, 1, 2), (NULL, 3, 3), (NULL, 2, 4), (NULL, 3, 5), (NULL, 3, 6), (NULL, 3, 7), (NULL, 2, 8), (NULL, 1, 9), (NULL, 3, 9);
+insert into theme_inscription values (NULL, 1, 3), (NULL, 2, 1), (NULL, 3, 3), (NULL, 4, 2), (NULL, 5, 3), (NULL, 6, 3), (NULL, 7, 3), (NULL, 8, 2), (NULL, 9, 1), (NULL, 9, 3);

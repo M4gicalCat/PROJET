@@ -1,3 +1,6 @@
+#This script is to run once to create the database and tables. It is not needed after the first run, unless you want to delete the database and start over.
+
+# sudo mysql -u root -p # login as root to create a new user and database
 # CREATE DATABASE IF NOT EXISTS phpProject;
 # CREATE USER IF NOT EXISTS 'phpProject'@'localhost' IDENTIFIED BY 'phpProject';
 # GRANT ALL PRIVILEGES ON phpProject.* TO 'phpProject'@'localhost';
@@ -36,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `theme_inscription` (
     `theme_id` int NOT NULL,
     `inscription_id` int NOT NULL,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`inscription_id`) REFERENCES `theme`(`id`),
-    FOREIGN KEY (`theme_id`) REFERENCES `inscription`(`id`),
+    FOREIGN KEY (`inscription_id`) REFERENCES `inscription`(`id`),
+    FOREIGN KEY (`theme_id`) REFERENCES `theme`(`id`),
     UNIQUE KEY `inscription_id_UNIQUE` (`inscription_id`, `theme_id`)
 );
