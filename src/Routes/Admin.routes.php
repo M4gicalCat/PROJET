@@ -6,26 +6,26 @@ Router::getRouter()->create("/admin", function () {
     echo json_encode($admin->public());
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create("/admin/create", function (array $data) {
+Router::getRouter()->create("/admin/create", function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Admin.php";
     $admin = Admin::create($data["username"], $data["password"]);
     echo json_encode($admin->public());
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create("/admin/update", function (array $data) {
+Router::getRouter()->create("/admin/update", function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Admin.php";
     $admin = Admin::update($_SESSION["admin"], ["username" => $data["username"], "password" => $data["password"]]);
     $_SESSION['admin'] = $data["username"];
     echo json_encode($admin->public());
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create("/admin/delete", function (array $data) {
+Router::getRouter()->create("/admin/delete", function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Admin.php";
     $admin = Admin::find($data["username"]);
     $admin->delete();
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create("/admin/login", function (array $data) {
+Router::getRouter()->create("/admin/login", function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Admin.php";
     $admin = Admin::find($data["username"]);
     if ($admin !== null && $admin->getPassword() === $data["password"]) {
@@ -50,19 +50,19 @@ Router::getRouter()->create("/admin/all", function () {
     echo json_encode($public);
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create('/admin/createInscription', function (array $data) {
+Router::getRouter()->create('/admin/createInscription', function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Inscription.php";
     $inscription = Inscription::create($data["email"]);
     echo json_encode($inscription->public());
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create('/admin/updateInscription', function (array $data) {
+Router::getRouter()->create('/admin/updateInscription', function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Inscription.php";
     $inscription = Inscription::update($data["id"], $data["email"]);
     echo json_encode($inscription->public());
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create('/admin/deleteInscription', function (array $data) {
+Router::getRouter()->create('/admin/deleteInscription', function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Inscription.php";
     Inscription::delete($data["id"]);
 }, AUTHENTICATION::$ADMIN);

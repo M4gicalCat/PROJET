@@ -40,7 +40,7 @@ export const Router = () => {
         }
       ],
     },
-  ]);
+  ], {basename: '/app'});
 
   return (
     <ThemeProvider theme={themes[theme]}>

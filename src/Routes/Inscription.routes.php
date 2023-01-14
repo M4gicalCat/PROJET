@@ -1,6 +1,6 @@
 <?php
 
-Router::getRouter()->create("/user/login", function (array $data) {
+Router::getRouter()->create("/user/login", function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
     $inscription = Inscription::findOrCreate($data["email"])->public();
     $_SESSION["email"] = $data["email"];
@@ -8,11 +8,11 @@ Router::getRouter()->create("/user/login", function (array $data) {
     echo json_encode($inscription);
 }, AUTHENTICATION::$NONE);
 
-Router::getRouter()->create('/user/get', function(array $data) {
+Router::getRouter()->create('/user/get', function(?array $data = []) {
     echo json_encode(Inscription::find($data["email"])->public());
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create("/user/update", function (array $data) {
+Router::getRouter()->create("/user/update", function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
     Inscription::update($_SESSION["email"], $data["email"]);
     echo json_encode(["result" => "OK"]);
@@ -41,7 +41,7 @@ Router::getRouter()->create('/user/logout', function () {
     echo json_encode(["result" => "OK"]);
 }, AUTHENTICATION::$USER);
 
-Router::getRouter()->create('/user/updateTheme', function (array $data) {
+Router::getRouter()->create('/user/updateTheme', function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
     $inscription = Inscription::find($_SESSION['id']);

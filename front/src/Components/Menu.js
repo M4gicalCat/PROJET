@@ -3,7 +3,8 @@ import styled from "styled-components";
 import {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faMoon, faSun, faX} from "@fortawesome/free-solid-svg-icons";
-import { useWindowSize } from "../hooks";
+import {useConnected, useWindowSize} from "../hooks";
+import {Spinner} from "./Spinner";
 
 const Nav = styled.nav`
   position: fixed;
@@ -138,12 +139,13 @@ const Background = styled.div`
 
 export const Menu = ({theme, setTheme}) => {
   const width = useWindowSize();
+  const {connected, loading} = useConnected();
   return (
     <>
       {(width < 500) ? <PhoneMenu theme={theme} setTheme={setTheme}/> : <LargeMenu theme={theme} setTheme={setTheme}/>}
       <Background>
         <div style={{height: "5rem"}}/>
-        <Outlet/>
+        {loading ? <Spinner /> : <Outlet/>}
       </Background>
     </>
   );

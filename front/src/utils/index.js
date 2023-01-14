@@ -6,6 +6,8 @@ export const api = async (route, data, ...params) => {
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
+            "PHPSESSID": getPHPSESSID(),
+            "credentials": 'include',
         },
         body: JSON.stringify(data),
         ...params,
@@ -14,4 +16,9 @@ export const api = async (route, data, ...params) => {
         throw new Error(result.message);
     }
     return result;
+}
+
+const getPHPSESSID = () => {
+    const cookie = document.cookie.split(';').find(cookie => cookie.startsWith('PHPSESSID'));
+    return cookie ? cookie.split('=')[1] : '';
 }
