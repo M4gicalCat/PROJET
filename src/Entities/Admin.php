@@ -56,15 +56,6 @@ class Admin
         ]);
     }
 
-
-    public static function count(): int
-    {
-        $db = PdoConnexion::getConnexion();
-        $query = $db->prepare("SELECT COUNT(*) FROM admin");
-        $query->execute();
-        return $query->fetchColumn();
-    }
-
     public static function findAll(): array
     {
         $db = PdoConnexion::getConnexion();

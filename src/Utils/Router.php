@@ -38,4 +38,3 @@ class Router
         echo json_encode(["message" => "Cette ressource n'existe pas", "code" => 404, "err" => true]);
     }
 }
-

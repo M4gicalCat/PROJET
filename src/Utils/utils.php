@@ -8,11 +8,11 @@ class AUTHENTICATION {
 
 /**
  * Checks that a user is authenticated
- * A user will set the $_SESSION["username"] variable, whereas an admin will set the $_SESSION["admin"] variable
+ * A user will set the $_SESSION["email"] variable, whereas an admin will set the $_SESSION["admin"] variable
  * @return int
  */
 function authenticate(): int
 {
-    if (!isset($_SESSION["username"]) && !isset($_SESSION["admin"])) return AUTHENTICATION::$NONE;
-    return isset($_SESSION["username"]) ? AUTHENTICATION::$USER : AUTHENTICATION::$ADMIN;
+    if (!isset($_SESSION["email"]) && !isset($_SESSION["admin"])) return AUTHENTICATION::$NONE;
+    return isset($_SESSION["email"]) ? AUTHENTICATION::$USER : AUTHENTICATION::$ADMIN;
 }

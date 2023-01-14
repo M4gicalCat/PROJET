@@ -2,16 +2,18 @@
 
 class Theme
 {
+    private int $id;
     private string $label;
 
-    private function __construct(string $label)
+    private function __construct(string $label, ?int $id = null)
     {
+        $this->id = $id;
         $this->label = $label;
     }
 
-    public static function factory(string $label): self
+    public static function factory(string $label, int $id): self
     {
-        return new self($label);
+        return new self($label, $id);
     }
 
     public static function create(string $label): self
@@ -21,7 +23,12 @@ class Theme
         $query->execute([
             "label" => $label
         ]);
-        return new self($label);
+        $query = $db->prepare('SELECT * FROM theme WHERE label = :label');
+        $query->execute([
+            'label' => $label,
+        ]);
+        $r = $query->fetch();
+        return new self($r["label"], $r['id']);
     }
 
     public static function find(string $label): self
@@ -32,16 +39,16 @@ class Theme
             "label" => $label
         ]);
         $result = $query->fetch();
-        return new self($result["label"]);
+        return new self($result["label"], $result['id']);
     }
 
-    public static function update(string $old_label, string $new_label): self
+    public static function update(int $id, string $new_label): self
     {
         $db = PdoConnexion::getConnexion();
-        $query = $db->prepare("UPDATE theme SET label = :label WHERE label = :oldLabel");
+        $query = $db->prepare("UPDATE theme SET label = :label WHERE id = :id");
         $query->execute([
             "label" => $new_label,
-            "oldLabel" => $old_label
+            "id" => $id
         ]);
         return new self($new_label);
     }
@@ -49,9 +56,10 @@ class Theme
     public function delete(): void
     {
         $db = PdoConnexion::getConnexion();
-        $query = $db->prepare("DELETE FROM theme WHERE label = :label");
+        $query = $db->prepare("DELETE FROM theme WHERE label = :label AND id = :id");
         $query->execute([
-            "label" => $this->label
+            "label" => $this->label,
+            'id' => $this->id,
         ]);
     }
 
@@ -72,8 +80,26 @@ class Theme
         $result = $query->fetchAll();
         $themes = [];
         foreach ($result as $theme) {
-            $themes[] = new self($theme["label"]);
+            $themes[] = new self($theme["label"], $theme['id']);
         }
         return $themes;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function public(): array
+    {
+        return [
+            'label' => $this->label,
+            'id' => $this->id,
+        ];
     }
 }
