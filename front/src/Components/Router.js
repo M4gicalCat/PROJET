@@ -7,12 +7,34 @@ import {Menu} from "./Menu";
 import {AuthAdmin} from "./Admin/AuthAdmin";
 import {HomeLogin} from "./HomeLogin";
 import {AuthUser} from "./User/AuthUser";
+import {Logout} from "./Logout";
+import {useDispatch, useSelector} from "react-redux";
+import {api} from "../utils";
+import {Spinner} from "./Spinner";
+import {setAccount, setAdmin} from "../store/AuthenticateSlice";
 
 export const Router = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") ?? "light");
+  const auth = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (auth) return;
+    (async () => {
+      const result = await api('/connected');
+      if (result.error) {
+        dispatch(setAccount(null));
+        dispatch(setAdmin(false));
+        return;
+      }
+      dispatch(setAccount(result));
+      dispatch(setAdmin(!!result.username));
+    })();
+  } ,[auth]);
+
   const router = createBrowserRouter([
     {
       path: '/',
@@ -40,6 +62,10 @@ export const Router = () => {
               element: <AuthUser />
             }
           ]
+        },
+        {
+          path: 'logout',
+          element: <Logout />
         }
       ],
     },
@@ -47,6 +73,7 @@ export const Router = () => {
 
   return (
     <ThemeProvider theme={themes[theme]}>
-      <RouterProvider router={router} />
-    </ThemeProvider>);
+      {auth ? <RouterProvider router={router} /> : <Spinner />}
+    </ThemeProvider>
+  );
 };

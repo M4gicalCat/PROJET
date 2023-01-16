@@ -38,8 +38,13 @@ $ROUTER->create('/connected', function () {
     echo json_encode(["error" => "Not connected"]);
 }, AUTHENTICATION::$NONE);
 
-$ROUTER->create("/session", function () {
-    echo json_encode($_SESSION);
+Router::getRouter()->create("/logout", function () {
+    require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Admin.php";
+    require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
+    unset($_SESSION["admin"]);
+    unset($_SESSION['email']);
+    unset($_SESSION['id']);
+    echo json_encode(["success" => "Logged out"]);
 }, AUTHENTICATION::$NONE);
 
 $ROUTER->run();

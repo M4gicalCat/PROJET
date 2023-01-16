@@ -1,10 +1,11 @@
-import {Link, Outlet} from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import styled from "styled-components";
-import {useState} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBars, faMoon, faSun, faX} from "@fortawesome/free-solid-svg-icons";
-import {useConnected, useWindowSize} from "../hooks";
-import {Spinner} from "./Spinner";
+import { useState} from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faMoon, faSun, faX } from "@fortawesome/free-solid-svg-icons";
+import { useWindowSize } from "../hooks";
+import { Spinner } from "./Spinner";
+import { useSelector } from "react-redux";
 
 const Nav = styled.nav`
   position: fixed;
@@ -70,7 +71,7 @@ const List = styled.div`
   }
 `;
 
-const PhoneMenu = ({theme, setTheme}) => {
+const PhoneMenu = ({theme, setTheme, connected}) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -80,16 +81,14 @@ const PhoneMenu = ({theme, setTheme}) => {
             <FontAwesomeIcon icon={faX} onClick={() => setOpen(false)}/>
             <List>
               <Link onClick={() => setOpen(false)} to="/">Accueil</Link>
-              <Link onClick={() => setOpen(false)} to="/episode">Episodes</Link>
-              <Link onClick={() => setOpen(false)} to="/personnages">Personnages</Link>
-              <Link onClick={() => setOpen(false)} to="/favoris">Favoris</Link>
-              <Link onClick={() => setOpen(false)} to="/account">Mon compte</Link>
+              {connected
+                ? (<Link onClick={() => setOpen(false)} to="/login">Se connecter</Link>)
+                : (<Link onClick={() => setOpen(false)} to="/logout">Se déconnecter</Link>)
+              }
             </List>
           </>
         ) : (
-          <>
             <FontAwesomeIcon icon={faBars} onClick={() => setOpen(true)}/>
-          </>
         )}
       <FontAwesomeIcon
         icon={theme === "light" ? faMoon : faSun}
@@ -99,10 +98,13 @@ const PhoneMenu = ({theme, setTheme}) => {
   );
 }
 
-const LargeMenu = ({theme, setTheme}) => (
+const LargeMenu = ({theme, setTheme, connected}) => (
   <Nav>
     <Link to="/">Accueil</Link>
-    <Link to="/login">Se connecter</Link>
+    {connected
+      ? (<Link to="/logout">Se déconnecter</Link>)
+      : (<Link to="/login">Se connecter</Link>)
+    }
     <FontAwesomeIcon
       style={{width: "1rem"}}
       icon={theme === "light" ? faMoon : faSun}
@@ -139,13 +141,14 @@ const Background = styled.div`
 
 export const Menu = ({theme, setTheme}) => {
   const width = useWindowSize();
-  const {connected, loading} = useConnected();
+  const auth = useSelector(state => state.auth);
+
   return (
     <>
-      {(width < 500) ? <PhoneMenu theme={theme} setTheme={setTheme}/> : <LargeMenu theme={theme} setTheme={setTheme}/>}
+      {(width < 500) ? <PhoneMenu {...{theme, setTheme, connected: !!auth?.account}}/> : <LargeMenu {...{theme, setTheme, connected: !!auth?.account}}/>}
       <Background>
         <div style={{height: "5rem"}}/>
-        {loading ? <Spinner /> : <Outlet/>}
+        {!auth ? <Spinner /> : <Outlet/>}
       </Background>
     </>
   );

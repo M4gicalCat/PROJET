@@ -36,11 +36,6 @@ Router::getRouter()->create("/admin/login", function (?array $data = []) {
     }
 }, AUTHENTICATION::$NONE);
 
-Router::getRouter()->create("/admin/logout", function () {
-    require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Admin.php";
-    unset($_SESSION["admin"]);
-}, AUTHENTICATION::$ADMIN);
-
 Router::getRouter()->create("/admin/all", function () {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Admin.php";
     $public = [];

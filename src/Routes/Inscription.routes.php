@@ -34,13 +34,6 @@ Router::getRouter()->create('/user/all', function () {
     echo json_encode($public);
 }, AUTHENTICATION::$ADMIN);
 
-Router::getRouter()->create('/user/logout', function () {
-    require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
-    unset($_SESSION['email']);
-    unset($_SESSION['id']);
-    echo json_encode(["result" => "OK"]);
-}, AUTHENTICATION::$USER);
-
 Router::getRouter()->create('/user/updateTheme', function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
