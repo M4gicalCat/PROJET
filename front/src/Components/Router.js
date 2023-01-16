@@ -1,6 +1,6 @@
 import {ThemeProvider} from "styled-components";
 import {createBrowserRouter, Outlet, RouterProvider} from "react-router-dom";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {themes} from "../themes";
 import {Error} from "./Error";
 import {Menu} from "./Menu";
@@ -10,6 +10,9 @@ import {AuthUser} from "./User/AuthUser";
 
 export const Router = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") ?? "light");
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
   const router = createBrowserRouter([
     {
       path: '/',

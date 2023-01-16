@@ -26,7 +26,7 @@ class Router
             $path = substr($path, 0, -1);
         }
         foreach ($this->routes as $route => $cb) {
-            if ($route === $path) {
+            if ('/api'.$route === $path) {
                 if (authenticate() < $cb["auth"]) {
                     echo json_encode(["message" => "You are not allowed to access this resource", "code" => 401, "err" => true]);
                     exit();
@@ -34,7 +34,6 @@ class Router
                 $cb["cb"](json_decode(file_get_contents('php://input'), true));
                 exit();
             }
-        }
-        echo json_encode(["message" => "Cette ressource n'existe pas", "code" => 404, "err" => true]);
+        };
     }
 }

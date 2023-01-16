@@ -1,21 +1,19 @@
 <?php
 session_start();
-session_set_cookie_params(0, '/', 'localhost');
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Headers: *");
-header("Access-Control-Allow-Credentials: true");
 include_once "src/PDO.php";
 include_once "src/Utils/Router.php";
 foreach (glob("Entities/*.php") as $filename)
 {
     include $filename;
 }
-
-if (str_starts_with($_SERVER['REQUEST_URI'], '/app')) {
-    // Serve the React app's static files
-    return false; // This will tell the server to look for the files requested in the filesystem
+if ($_SERVER['REQUEST_URI'] === "/") {
+    header("Location: /app");
+    exit();
 }
 
+if (!str_starts_with($_SERVER['REQUEST_URI'], '/api')) {
+    return false;
+}
 
 $ROUTER = Router::getRouter();
 
@@ -45,3 +43,4 @@ $ROUTER->create("/session", function () {
 }, AUTHENTICATION::$NONE);
 
 $ROUTER->run();
+return false;
