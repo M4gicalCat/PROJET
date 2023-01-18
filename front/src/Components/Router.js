@@ -22,7 +22,7 @@ export const Router = () => {
   }, [theme]);
 
   useEffect(() => {
-    if (auth) return;
+    if ([...Object.keys(auth)].length > 0) return;
     (async () => {
       const result = await api('/connected');
       if (result.error) {
@@ -33,7 +33,7 @@ export const Router = () => {
       dispatch(setAccount(result));
       dispatch(setAdmin(!!result.username));
     })();
-  } ,[auth]);
+  }, [auth]);
 
   const router = createBrowserRouter([
     {
