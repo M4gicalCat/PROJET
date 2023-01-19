@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_URI'] === "/") {
 if (!str_starts_with($_SERVER['REQUEST_URI'], '/api')) {
     return false;
 }
-
+header('Content-Type: application/json');
 $ROUTER = Router::getRouter();
 
 foreach (glob("src/Routes/*.routes.php") as $filename)

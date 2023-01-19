@@ -12,14 +12,14 @@ import {useDispatch, useSelector} from "react-redux";
 import {api} from "../utils";
 import {Spinner} from "./Spinner";
 import {setAccount, setAdmin} from "../store/AuthenticateSlice";
+import {Accueil} from "./Accueil";
+import {ThemeList} from "./Admin/ThemeList";
+import {UserList} from "./Admin/UserList";
 
 export const Router = () => {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") ?? "light");
   const auth = useSelector((state) => state.auth);
+  const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     if ([...Object.keys(auth)].length > 0) return;
@@ -38,12 +38,12 @@ export const Router = () => {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Menu theme={theme} setTheme={setTheme} />,
+      element: <Menu />,
       errorElement: <Error />,
       children: [
         {
           path: '/',
-          element: <>coucou</>,
+          element: <Accueil />,
         },
         {
           path: 'login',
@@ -66,13 +66,27 @@ export const Router = () => {
         {
           path: 'logout',
           element: <Logout />
+        },
+        {
+          path: 'admin',
+          element: <Outlet />,
+          children: [
+            {
+              path: 'themes',
+              element: <ThemeList />
+            },
+            {
+              path: 'inscriptions',
+              element: <UserList />
+            }
+          ]
         }
       ],
     },
   ], {basename: '/app'});
 
   return (
-    <ThemeProvider theme={themes[theme]}>
+    <ThemeProvider theme={theme}>
       {auth ? <RouterProvider router={router} /> : <Spinner />}
     </ThemeProvider>
   );

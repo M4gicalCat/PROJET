@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faMoon, faSun, faX } from "@fortawesome/free-solid-svg-icons";
 import { useWindowSize } from "../hooks";
 import { Spinner } from "./Spinner";
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {setTheme} from "../store/ThemeSlice";
 
 const Nav = styled.nav`
   position: fixed;
@@ -139,13 +140,19 @@ const Background = styled.div`
   }
 `;
 
-export const Menu = ({theme, setTheme}) => {
+export const Menu = () => {
   const width = useWindowSize();
   const auth = useSelector(state => state.auth);
+  const theme = useSelector(state => state.theme);
+  const dispatch = useDispatch();
+
+  const changeTheme = (theme) => {
+    dispatch(setTheme(theme));
+  }
 
   return (
     <>
-      {(width < 500) ? <PhoneMenu {...{theme, setTheme, connected: !!auth?.account}}/> : <LargeMenu {...{theme, setTheme, connected: !!auth?.account}}/>}
+      {(width < 500) ? <PhoneMenu {...{theme, changeTheme, connected: !!auth?.account}}/> : <LargeMenu {...{theme, changeTheme, connected: !!auth?.account}}/>}
       <Background>
         <div style={{height: "5rem"}}/>
         {!auth ? <Spinner /> : <Outlet/>}

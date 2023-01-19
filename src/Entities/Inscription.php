@@ -89,6 +89,14 @@ class Inscription
         ]);
     }
 
+    public static function count(): array
+    {
+        $db = PdoConnexion::getConnexion();
+        $query = $db->prepare("SELECT COUNT(*) as count FROM inscription");
+        $query->execute();
+        return $query->fetch();
+    }
+
     public function updateTheme(Theme $theme): void
     {
         $db = PdoConnexion::getConnexion();
@@ -111,6 +119,7 @@ class Inscription
 
     public static function findAll(): array
     {
+        require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
         $db = PdoConnexion::getConnexion();
         $a = $db->prepare('SELECT i.id as user_id, i.email, t.label, t.id as theme_id FROM inscription i
             LEFT JOIN theme_inscription ti on i.id = ti.inscription_id

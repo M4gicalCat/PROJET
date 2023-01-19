@@ -44,3 +44,8 @@ Router::getRouter()->create('/user/updateTheme', function (?array $data = []) {
     }
     echo json_encode($inscription->public());
 }, AUTHENTICATION::$USER);
+
+Router::getRouter()->create('/user/count', function () {
+    require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
+    echo json_encode(Inscription::count());
+}, AUTHENTICATION::$ADMIN);

@@ -53,23 +53,21 @@ class Theme
         return new self($new_label);
     }
 
-    public function delete(): void
+    public static function delete(?int $id = 0): void
     {
         $db = PdoConnexion::getConnexion();
-        $query = $db->prepare("DELETE FROM theme WHERE label = :label AND id = :id");
+        $query = $db->prepare("DELETE FROM theme WHERE id = :id");
         $query->execute([
-            "label" => $this->label,
-            'id' => $this->id,
+            'id' => $id,
         ]);
     }
 
-    public static function count(): int
+    public static function count(): array
     {
         $db = PdoConnexion::getConnexion();
-        $query = $db->prepare("SELECT COUNT(*) FROM theme");
+        $query = $db->prepare("SELECT COUNT(*) as count FROM theme");
         $query->execute();
-        $result = $query->fetch();
-        return $result[0];
+        return $query->fetch();
     }
 
     public static function findAll(): array
