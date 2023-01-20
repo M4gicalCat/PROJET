@@ -11,6 +11,8 @@ const SpinnerContainer = styled.div`
 const SpinnerItem = styled.div`
   width: 25px;
   height: 25px;
+  max-width: 25px;
+  max-height: 25px;
   border: 5px solid ${({theme}) => theme.color.spinner};
   border-radius: 50%;
   border-top-color: transparent;

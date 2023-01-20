@@ -57,7 +57,8 @@ class Inscription
     }
 
     public static function find(string $email): self | false
-    {require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
+    {
+        require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
         $db = PdoConnexion::getConnexion();
         $query = $db->prepare("
             SELECT i.id, i.email, t.id as theme_id, t.label as theme_label 
@@ -123,7 +124,7 @@ class Inscription
         $db = PdoConnexion::getConnexion();
         $a = $db->prepare('SELECT i.id as user_id, i.email, t.label, t.id as theme_id FROM inscription i
             LEFT JOIN theme_inscription ti on i.id = ti.inscription_id
-            LEFT JOIN theme t on t.id = ti.theme_id
+            LEFT OUTER JOIN theme t on t.id = ti.theme_id
             GROUP BY i.id, i.email, t.label, t.id;');
         $a->execute();
 

@@ -3,10 +3,13 @@ import {createSlice} from "@reduxjs/toolkit";
 
 export const ThemeSlice = createSlice({
   name: 'theme',
-  initialState: themes[localStorage.getItem("theme") ?? "light"],
+  initialState: {...themes[localStorage.getItem("theme") ?? "light"], name: localStorage.getItem("theme") ?? "light"},
   reducers: {
     setTheme: (state, {payload}) => {
-      state.theme = themes[payload];
+      const newState = {...themes[payload], name: payload};
+      for (const prop in newState) {
+        state[prop] = newState[prop];
+      }
       localStorage.setItem("theme", payload);
     },
   },

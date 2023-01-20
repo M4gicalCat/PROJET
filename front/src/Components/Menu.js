@@ -7,6 +7,7 @@ import { useWindowSize } from "../hooks";
 import { Spinner } from "./Spinner";
 import {useDispatch, useSelector} from "react-redux";
 import {setTheme} from "../store/ThemeSlice";
+import {themes} from "../themes";
 
 const Nav = styled.nav`
   position: fixed;
@@ -72,8 +73,11 @@ const List = styled.div`
   }
 `;
 
-const PhoneMenu = ({theme, setTheme, connected}) => {
+const PhoneMenu = ({connected}) => {
   const [open, setOpen] = useState(false);
+  const theme = useSelector(state => state.theme);
+  const dispatch = useDispatch();
+  const toggleTheme = () => dispatch(setTheme(theme.name === "light" ? "dark" : "light"));
 
   return (
     <SmallNav>
@@ -93,26 +97,31 @@ const PhoneMenu = ({theme, setTheme, connected}) => {
         )}
       <FontAwesomeIcon
         icon={theme === "light" ? faMoon : faSun}
-        onClick={() => setTheme(old => old === "light" ? 'dark' : 'light')}
+        onClick={() => toggleTheme()}
       />
     </SmallNav>
   );
 }
 
-const LargeMenu = ({theme, setTheme, connected}) => (
-  <Nav>
-    <Link to="/">Accueil</Link>
-    {connected
-      ? (<Link to="/logout">Se déconnecter</Link>)
-      : (<Link to="/login">Se connecter</Link>)
-    }
-    <FontAwesomeIcon
-      style={{width: "1rem"}}
-      icon={theme === "light" ? faMoon : faSun}
-      onClick={() => setTheme(old => old === "light" ? 'dark' : 'light')}
-    />
-  </Nav>
-);
+const LargeMenu = ({connected}) => {
+  const theme = useSelector(state => state.theme);
+  const dispatch = useDispatch();
+  const toggleTheme = () => dispatch(setTheme(theme.name === "light" ? "dark" : "light"));
+  return (
+    <Nav>
+      <Link to="/">Accueil</Link>
+      {connected
+        ? (<Link to="/logout">Se déconnecter</Link>)
+        : (<Link to="/login">Se connecter</Link>)
+      }
+      <FontAwesomeIcon
+        style={{width: "1rem"}}
+        icon={theme === "light" ? faMoon : faSun}
+        onClick={() => toggleTheme()}
+      />
+    </Nav>
+  );
+};
 
 const Background = styled.div`
   background-color: ${props => props.theme.background};
@@ -143,16 +152,10 @@ const Background = styled.div`
 export const Menu = () => {
   const width = useWindowSize();
   const auth = useSelector(state => state.auth);
-  const theme = useSelector(state => state.theme);
-  const dispatch = useDispatch();
-
-  const changeTheme = (theme) => {
-    dispatch(setTheme(theme));
-  }
 
   return (
     <>
-      {(width < 500) ? <PhoneMenu {...{theme, changeTheme, connected: !!auth?.account}}/> : <LargeMenu {...{theme, changeTheme, connected: !!auth?.account}}/>}
+      {(width < 500) ? <PhoneMenu {...{connected: !!auth?.account}}/> : <LargeMenu connected={!!auth?.account}/>}
       <Background>
         <div style={{height: "5rem"}}/>
         {!auth ? <Spinner /> : <Outlet/>}

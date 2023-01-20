@@ -32,3 +32,8 @@ Router::getRouter()->create('/theme/count', function () {
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
     echo json_encode(Theme::count());
 }, AUTHENTICATION::$USER);
+
+Router::getRouter()->create('/theme/update', function (?array $data = []) {
+    require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
+    echo json_encode(Theme::update($data["id"], $data["label"]));
+}, AUTHENTICATION::$ADMIN);

@@ -4,7 +4,7 @@ import {Spinner} from "../Spinner";
 import {ErrorMessage} from "../ErrorMessage";
 import {ActionButton} from "../ActionButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFloppyDisk, faPlusCircle, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faFloppyDisk, faPen, faPlusCircle, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useSelector} from "react-redux";
 import {Title} from "../Title";
 import {List} from "../List";
@@ -14,11 +14,36 @@ const AB = styled(ActionButton)`
   margin: 0 0 1rem auto;
 `;
 
+const Input = styled.input`
+  padding: .5rem;
+  border: none;
+  border-bottom: 1px solid ${({theme}) => theme.color.border};
+  background-color: transparent;
+  color: ${({theme}) => theme.color.text};
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+const ThemeInput = ({label, setLabel}) => {
+  return <Input
+    type="text"
+    value={label}
+    onInput={e => setLabel(e.target.value)}
+  />
+}
+
 export const ThemeList = () => {
   const theme = useSelector(state => state.theme);
   const [themes, setThemes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState({all: true, edit: null});
   const [error, setError] = useState("");
+  const [edit, setEdit] = useState(null);
+  const [editLabel, setEditLabel] = useState("");
+  const [newLabel, setNewLabel] = useState(null);
 
   const deleteTheme = async (id) => {
     setLoading(true);
@@ -30,10 +55,44 @@ export const ThemeList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const createTheme = async () => {
+    setLoading(o => ({...o, create: true}));
+    try {
+      const theme = await api('/theme/create', {label: newLabel});
+      setThemes(th => [...th, theme]);
+      setNewLabel(null);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(o => ({...o, create: false}));
+    }
+  }
+
+  const handleEdit = async (id) => {
+    if (edit !== id) {
+      setEdit(id);
+      setEditLabel(themes.find(t => t.id === id).label);
+      return;
+    }
+    if (editLabel === themes.find(t => t.id === id).label) {
+      return setEdit(null);
+    }
+    setLoading(o => ({...o, edit: id}));
+    try {
+      await api('/theme/update', {id, label: editLabel});
+      setThemes(themes.map(t => t.id === id ? {...t, label: editLabel} : t));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(o => ({...o, edit: null}));
+      setEdit(null);
+    }
   }
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(o => ({...o, all: true}));
     (async () => {
       try {
         const result = await api('/theme/all');
@@ -41,34 +100,50 @@ export const ThemeList = () => {
       } catch (e) {
         setError(e.message);
       } finally {
-        setLoading(false);
+        setLoading(o => ({...o, all: false}));
       }
     })();
   }, []);
 
-  if (loading) return <Spinner />;
-  if (error) return <ErrorMessage message={error} />;
+  if (loading.all) return <Spinner />;
 
   return (
     <>
       <Title>Thèmes</Title>
+      <ErrorMessage message={error} />
       <List>
         <AB>
-          <FontAwesomeIcon icon={faPlusCircle} color={theme.color.text} style={{width: "1.5rem", height: '1.5rem'}}/>
+          <FontAwesomeIcon icon={faPlusCircle} color={theme.color.text} style={{width: "1.5rem", height: '1.5rem'}} onClick={() => setNewLabel(l => l ?? "Nouveau thème")} />
         </AB>
-        {themes.map(({id, label}) => (
-          <div key={id}>
-            <span>{label}</span>
+        {themes.map(({id, label}) => {
+          return loading.edit === id ? <Spinner /> : (
+            <div key={id}>
+              {edit === id ? <ThemeInput label={editLabel} setLabel={setEditLabel} /> : <span>{label}</span>}
+              <div>
+                <ActionButton>
+                  <FontAwesomeIcon onClick={() => handleEdit(id)} color={theme.color.text}
+                                   icon={edit === id ? faFloppyDisk : faPen}/>
+                </ActionButton>
+                <ActionButton>
+                  <FontAwesomeIcon color={theme.color.error.background} onClick={() => deleteTheme(id)} icon={faTrash}/>
+                </ActionButton>
+              </div>
+            </div>
+          );
+        })}
+        {newLabel !== null && (
+          <div key={-1}>
+            <ThemeInput label={newLabel} setLabel={setNewLabel} />
             <div>
               <ActionButton>
-                <FontAwesomeIcon color={theme.color.text} icon={faFloppyDisk} />
+                <FontAwesomeIcon onClick={() => createTheme()} color={theme.color.text} icon={faFloppyDisk}/>
               </ActionButton>
               <ActionButton>
-                <FontAwesomeIcon color={theme.color.error.background} onClick={() => deleteTheme(id)} icon={faTrash} />
+                <FontAwesomeIcon color={theme.color.error.background} onClick={() => setNewLabel(null)} icon={faTrash}/>
               </ActionButton>
             </div>
           </div>
-        ))}
+        )}
       </List>
 
     </>

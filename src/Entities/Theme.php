@@ -42,7 +42,7 @@ class Theme
         return new self($result["label"], $result['id']);
     }
 
-    public static function update(int $id, string $new_label): self
+    public static function update(int $id, string $new_label=""): self
     {
         $db = PdoConnexion::getConnexion();
         $query = $db->prepare("UPDATE theme SET label = :label WHERE id = :id");
@@ -50,7 +50,7 @@ class Theme
             "label" => $new_label,
             "id" => $id
         ]);
-        return new self($new_label);
+        return new self($new_label, $id);
     }
 
     public static function delete(?int $id = 0): void
