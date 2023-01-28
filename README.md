@@ -1,7 +1,7 @@
 # PROJET PHP 
 ## Auteurs
-- Philippe FAISANDIER
-- Evan PAUTOT
+- [Philippe FAISANDIER](https://github.com/M4gicalCat)
+- [Evan PAUTOT](https://github.com/Evan12347)
 
 ## Installation
 ```shell
