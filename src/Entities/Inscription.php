@@ -79,10 +79,10 @@ class Inscription
         return new self(+$result[0]["id"], $result[0]["email"], $themes);
     }
 
-    public static function delete(int $id): void
+    public static function delete($id): void
     {
         $db = PdoConnexion::getConnexion();
-        $db->prepare('DELETE FROM theme_inscription WHERE theme_id = :id;')->execute([
+        $db->prepare('DELETE FROM theme_inscription WHERE inscription_id = :id;')->execute([
             'id' => $id,
         ]);
         $db->prepare('DELETE FROM inscription WHERE id = :id;')->execute([
@@ -124,24 +124,13 @@ class Inscription
         $db = PdoConnexion::getConnexion();
         $a = $db->prepare('SELECT i.id as user_id, i.email, t.label, t.id as theme_id FROM inscription i
             LEFT JOIN theme_inscription ti on i.id = ti.inscription_id
-            LEFT OUTER JOIN theme t on t.id = ti.theme_id
+            LEFT JOIN theme t on t.id = ti.theme_id
             GROUP BY i.id, i.email, t.label, t.id;');
         $a->execute();
 
         $users = [];
-        $user = null;
-        $last_id = null;
         foreach ($a->fetchAll() as $row) {
-            if ($last_id !== $row["user_id"]) {
-                if ($user !== null) {
-                    $users[] = $user;
-                }
-                $user = new self($row["user_id"], $row["email"]);
-                $last_id = $row["user_id"];
-            }
-            if ($row["theme_id"] !== null) {
-                $user->addTheme(Theme::factory($row["label"], $row["theme_id"]));
-            }
+            $users[$row["user_id"]] = new self($row["user_id"], $row["email"], [...($users["user_id"]['themes'] ?? []), Theme::factory($row["label"], $row["theme_id"])]);
         }
         return $users;
     }

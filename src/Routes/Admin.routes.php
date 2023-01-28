@@ -60,6 +60,7 @@ Router::getRouter()->create('/admin/updateInscription', function (?array $data =
 Router::getRouter()->create('/admin/deleteInscription', function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT']."/src/Entities/Inscription.php";
     Inscription::delete($data["id"]);
+    echo json_encode(["result" => "OK"]);
 }, AUTHENTICATION::$ADMIN);
 
 Router::getRouter()->create('/admin/updateUserTheme', function (array $data) {
