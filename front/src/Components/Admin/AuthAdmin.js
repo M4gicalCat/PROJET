@@ -22,6 +22,7 @@ export const AuthAdmin = () => {
     setLoading(true);
     try {
       const result = await api('/admin/login', {username, password});
+      if (result.error) throw new Error(result.error);
       dispatch(setAccount(result));
       dispatch(setAdmin(true));
     } catch (e) {
@@ -44,8 +45,8 @@ export const AuthAdmin = () => {
     <Form onSubmit={handleSubmit}>
       <Title border>Connexion <br/> administrateur</Title>
       <input type="text" placeholder="Nom" value={username} onChange={(e) => setUsername(e.target.value)}/>
-      <input type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)}/>
-      <Button type="submit" disabled={loading || !auth}>Se connecter</Button>
+      <input type="password" autoComplete="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)}/>
+      <Button type="submit" disabled={loading || !auth || [username.length, password.length].includes(0)}>Se connecter</Button>
       <ErrorMessage message={error}/>
     </Form>
   );

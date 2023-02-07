@@ -1,9 +1,10 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const Button = styled.button`
-  background-color: ${({theme, danger}) => theme.color[danger ? "error" : "button"].background};
+  background-color: ${({ theme, danger }) =>
+    theme.color[danger ? 'error' : 'button'].background};
   border: none;
-  color: ${({theme}) => theme.color.button.text};
+  color: ${({ theme }) => theme.color.button.text};
   padding: 1rem 2rem;
   text-align: center;
   text-decoration: none;
@@ -13,6 +14,6 @@ export const Button = styled.button`
   cursor: pointer;
   border-radius: 12px;
   &:disabled {
-    background-color: ${({theme}) => theme.color.button.disabled};
+    background-color: ${({ theme }) => theme.color.button.disabled};
   }
 `;

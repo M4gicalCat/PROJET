@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const ActionButton = styled.button`
   background-color: transparent;
@@ -8,7 +8,7 @@ export const ActionButton = styled.button`
   border: none;
   cursor: pointer;
   outline: none;
-  transition-duration: .25s;
+  transition-duration: 0.25s;
   :hover {
     transform: scale(1.1);
   }

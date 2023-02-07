@@ -35,8 +35,9 @@ class Inscription
         return $found ?: self::create($email);
     }
 
-    public static function update(int $id, string $new_email): self
+    public static function update($id, $new_email, $themes): self
     {
+        include_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
         $db = PdoConnexion::getConnexion();
         $query = $db->prepare("UPDATE inscription SET email = :email WHERE id = :id");
         $query->execute([
@@ -44,7 +45,16 @@ class Inscription
             "id" => $id
         ]);
 
-        $q = $db->prepare('SELECT * FROM theme LEFT JOIN theme_inscription ti on theme.id = ti.theme_id WHERE ti.inscription_id = :id');
+        $db->prepare('DELETE FROM theme_inscription WHERE inscription_id = :id;')->execute([
+            'id' => $id,
+        ]);
+        foreach ($themes as $theme_id) {
+            $db->prepare('INSERT INTO theme_inscription (inscription_id, theme_id) VALUES (:inscription_id, :theme_id);')->execute([
+                'inscription_id' => $id,
+                'theme_id' => $theme_id,
+            ]);
+        }
+        $q = $db->prepare('SELECT theme.id as theme_id, theme.label as theme_label FROM theme LEFT JOIN theme_inscription ti on theme.id = ti.theme_id WHERE ti.inscription_id = :id');
         $q->execute([
             'id' => $id,
         ]);
@@ -130,7 +140,10 @@ class Inscription
 
         $users = [];
         foreach ($a->fetchAll() as $row) {
-            $users[$row["user_id"]] = new self($row["user_id"], $row["email"], [...($users["user_id"]['themes'] ?? []), Theme::factory($row["label"], $row["theme_id"])]);
+            $theme = $row["theme_id"] ? Theme::factory($row["label"], $row["theme_id"]) : null;
+            $themes = $users[$row["user_id"]]->themes ?? [];
+            if ($theme !== null) $themes[] = $theme;
+            $users[$row["user_id"]] = new self($row["user_id"], $row["email"], $themes);
         }
         return $users;
     }

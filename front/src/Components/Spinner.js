@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 const SpinnerContainer = styled.div`
   display: flex;
@@ -13,7 +13,7 @@ const SpinnerItem = styled.div`
   height: 25px;
   max-width: 25px;
   max-height: 25px;
-  border: 5px solid ${({theme}) => theme.color.spinner};
+  border: 5px solid ${({ theme }) => theme.color.spinner};
   border-radius: 50%;
   border-top-color: transparent;
   animation: spin 1s linear infinite;
@@ -26,6 +26,6 @@ const SpinnerItem = styled.div`
 
 export const Spinner = () => (
   <SpinnerContainer>
-    <SpinnerItem/>
+    <SpinnerItem />
   </SpinnerContainer>
 );

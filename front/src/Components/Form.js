@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const Form = styled.form`
   display: flex;
@@ -9,15 +9,15 @@ export const Form = styled.form`
   transform: translate(-50%, -50%);
   width: max-content;
   padding: 1rem;
-  border: ${({theme}) => theme.color.border} 1px solid;
+  border: ${({ theme }) => theme.color.border} 1px solid;
   border-radius: 5px;
-  
+
   > input {
-    padding: .5rem;
+    padding: 0.5rem;
     outline: none;
-    background-color: ${({theme}) => theme.color.card.background};
-    border: 1px solid ${({theme}) => theme.color.card.shadow};
-    margin: .5rem;
-    color: ${({theme}) => theme.color.text}
+    background-color: ${({ theme }) => theme.color.card.background};
+    border: 1px solid ${({ theme }) => theme.color.card.shadow};
+    margin: 0.5rem;
+    color: ${({ theme }) => theme.color.text};
   }
 `;

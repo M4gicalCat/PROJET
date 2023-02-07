@@ -1,24 +1,25 @@
-import {ThemeProvider} from "styled-components";
-import {createBrowserRouter, Outlet, RouterProvider} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import {themes} from "../themes";
-import {Error} from "./Error";
-import {Menu} from "./Menu";
-import {AuthAdmin} from "./Admin/AuthAdmin";
-import {HomeLogin} from "./HomeLogin";
-import {AuthUser} from "./User/AuthUser";
-import {Logout} from "./Logout";
-import {useDispatch, useSelector} from "react-redux";
-import {api} from "../utils";
-import {Spinner} from "./Spinner";
-import {setAccount, setAdmin} from "../store/AuthenticateSlice";
-import {Accueil} from "./Accueil";
-import {ThemeList} from "./Admin/ThemeList";
-import {UserList} from "./Admin/UserList";
+import { ThemeProvider } from 'styled-components';
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { themes } from '../themes';
+import { Error } from './Error';
+import { Menu } from './Menu';
+import { AuthAdmin } from './Admin/AuthAdmin';
+import { HomeLogin } from './HomeLogin';
+import { AuthUser } from './User/AuthUser';
+import { Logout } from './Logout';
+import { useDispatch, useSelector } from 'react-redux';
+import { api } from '../utils';
+import { Spinner } from './Spinner';
+import { setAccount, setAdmin } from '../store/AuthenticateSlice';
+import { Accueil } from './Accueil';
+import { ThemeList } from './Admin/ThemeList';
+import { UserList } from './Admin/UserList';
+import { AdminList } from './Admin/AdminList';
 
 export const Router = () => {
-  const auth = useSelector((state) => state.auth);
-  const theme = useSelector((state) => state.theme);
+  const auth = useSelector(state => state.auth);
+  const theme = useSelector(state => state.theme);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -35,55 +36,62 @@ export const Router = () => {
     })();
   }, [auth]);
 
-  const router = createBrowserRouter([
-    {
-      path: '/',
-      element: <Menu />,
-      errorElement: <Error />,
-      children: [
-        {
-          path: '/',
-          element: <Accueil />,
-        },
-        {
-          path: 'login',
-          element: <Outlet />,
-          children: [
-            {
-              path: "",
-              element: <HomeLogin />
-            },
-            {
-              path: 'admin',
-              element: <AuthAdmin />,
-            },
-            {
-              path: 'user',
-              element: <AuthUser />
-            }
-          ]
-        },
-        {
-          path: 'logout',
-          element: <Logout />
-        },
-        {
-          path: 'admin',
-          element: <Outlet />,
-          children: [
-            {
-              path: 'themes',
-              element: <ThemeList />
-            },
-            {
-              path: 'inscriptions',
-              element: <UserList />
-            }
-          ]
-        }
-      ],
-    },
-  ], {basename: '/app'});
+  const router = createBrowserRouter(
+    [
+      {
+        path: '/',
+        element: <Menu />,
+        errorElement: <Error />,
+        children: [
+          {
+            path: '/',
+            element: <Accueil />,
+          },
+          {
+            path: 'login',
+            element: <Outlet />,
+            children: [
+              {
+                path: '',
+                element: <HomeLogin />,
+              },
+              {
+                path: 'admin',
+                element: <AuthAdmin />,
+              },
+              {
+                path: 'user',
+                element: <AuthUser />,
+              },
+            ],
+          },
+          {
+            path: 'logout',
+            element: <Logout />,
+          },
+          {
+            path: 'admin',
+            element: <Outlet />,
+            children: [
+              {
+                path: 'themes',
+                element: <ThemeList />,
+              },
+              {
+                path: 'inscriptions',
+                element: <UserList />,
+              },
+              {
+                path: 'admins',
+                element: <AdminList />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    { basename: '/app' }
+  );
 
   return (
     <ThemeProvider theme={theme}>
