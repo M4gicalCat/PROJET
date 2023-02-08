@@ -16,6 +16,7 @@ import { Accueil } from './Accueil';
 import { ThemeList } from './Admin/ThemeList';
 import { UserList } from './Admin/UserList';
 import { AdminList } from './Admin/AdminList';
+import { User } from './User/User';
 
 export const Router = () => {
   const auth = useSelector(state => state.auth);

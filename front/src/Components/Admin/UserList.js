@@ -91,7 +91,7 @@ List.Item.Body = styled.div`
   }
 `;
 
-const Theme = ({ chosen, theme, changeVisibility }) => (
+export const Theme = ({ chosen, theme, changeVisibility }) => (
   <div style={{ display: 'flex', flexDirection: 'row' }}>
     <ActionButton onClick={() => changeVisibility(theme.id)}>
       <FontAwesomeIcon
@@ -265,7 +265,7 @@ export const UserList = () => {
     }
   };
 
-  const getThemes = async () => {
+   const getThemes = async () => {
     if (themes.length > 0 || loading.themes) return;
     setError('');
 

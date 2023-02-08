@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useEffect, useRef } from 'react';
-import { User } from './User';
+import { User } from './User/User';
 import { Admin } from './Admin/Admin';
 import { CustomLink } from './CustomLink';
 
