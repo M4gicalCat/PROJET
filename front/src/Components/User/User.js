@@ -22,21 +22,25 @@ const Container = styled.div`
   }
 `;
 
-// Dans un composant, il faut déstructurer ems props ( {truc, machin} au lieu de truc, machin)
-// ensuite, là où il est appelé (Accueil.js), il ne reçoit pas de props => getThemes, themes, updateUser sera toujours undefined
+// là où il est appelé (Accueil.js), il ne reçoit pas de props => getThemes, themes, updateUser sera toujours undefined
 
 // récupère les fonctions dans le côté admin, par contre les routes ne sont pas les mêmes (appeler les routes côté utilisateur et pas admin)
-export const User = (getThemes, themes, updateUser) => {
+export const User = () => {
   const auth = useSelector(state => state.auth);
   const redirect = useNavigate();
 
-  const [user, setUser] = useState();
-  // user est toujours undefined => user.email lance une erreur
+  const [user, setUser] = useState({});
   const [email, setEmail] = useState(user.email);
   const theme = useSelector(state => state.theme);
-  // mee chose que user.email
+  const [themes, setThemes] = useState([]);
   const [chosenThemes, setChosenThemes] = useState(user.themes);
   const [unchosenThemes, setUnchosenThemes] = useState([]);
+  const [loading, setLoading] = useState({
+    all: true,
+    themes: null,
+    edit: null,
+  });
+  const [error, setError] = useState('');
 
   useEffect(() => {
     getThemes();
@@ -59,6 +63,34 @@ export const User = (getThemes, themes, updateUser) => {
   useEffect(() => {
     api('/user/get').then(setUser);
   }, [auth]);
+
+  const updateUser = async (id, email, themes) => {
+    try {
+      await api('/user/update', {
+        id,
+        email,
+        themes: themes.map(t => t.id),
+      });
+      user.themes = themes;
+      user.email = email;
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const getThemes = async () => {
+    if (themes.length > 0 || loading.themes) return;
+    setError('');
+
+    setLoading(o => ({ ...o, themes: true }));
+    try {
+      setThemes(await api('/theme/all'));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(o => ({ ...o, themes: false }));
+    }
+  };
 
   if ((!auth.account && 'account' in auth) || auth.admin) redirect('/login');
 
