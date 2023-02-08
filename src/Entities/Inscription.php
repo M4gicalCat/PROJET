@@ -21,11 +21,20 @@ class Inscription
         $query->execute([
             "email" => $email
         ]);
+        $themes = Theme::findAll();
+        // insert into theme_inscription all themes for the new inscription in one query
+        $values = [];
+
         $q = $db->prepare('SELECT id FROM inscription WHERE email = :email;');
         $q->execute([
             'email' => $email,
         ]);
         $id = +$q->fetch()["id"];
+
+        foreach ($themes as $theme) {
+            $values[] = "({$id}, {$theme->getId()})";
+        }
+        $db->prepare("INSERT INTO theme_inscription (inscription_id, theme_id) VALUES " . implode(", ", $values) . ";")->execute();
         return new self($id, $email, Theme::findAll());
     }
 
@@ -71,10 +80,10 @@ class Inscription
         require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Theme.php';
         $db = PdoConnexion::getConnexion();
         $query = $db->prepare("
-            SELECT i.id, i.email, t.id as theme_id, t.label as theme_label 
+            SELECT i.id, i.email, t.id as theme_id, t.label as theme_label
             FROM inscription i
-            JOIN theme_inscription ti ON ti.inscription_id = i.id
-            JOIN theme t ON t.id = ti.theme_id
+            LEFT JOIN theme_inscription ti ON ti.inscription_id = i.id
+            LEFT JOIN theme t ON t.id = ti.theme_id
             WHERE i.email = :email
         ");
         $query->execute([
@@ -84,6 +93,7 @@ class Inscription
         if ($result === false || count($result) === 0) return false;
         $themes = [];
         foreach ($result as $row) {
+            if ($row["theme_id"] === null) continue;
             $themes[] = Theme::factory($row["theme_label"], $row["theme_id"]);
         }
         return new self(+$result[0]["id"], $result[0]["email"], $themes);

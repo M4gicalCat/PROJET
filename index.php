@@ -26,8 +26,11 @@ $ROUTER->create('/connected', function () {
     // user connected
     if (isset($_SESSION["email"])) {
         include_once "src/Entities/Inscription.php";
-        echo json_encode(Inscription::find($_SESSION["email"])->public());
-        exit();
+        $inscription = Inscription::find($_SESSION["email"]);
+        if ($inscription) {
+            echo json_encode($inscription->public());
+            exit();
+        }
     }
     if (isset($_SESSION["admin"])) {
         include_once "src/Entities/Admin.php";

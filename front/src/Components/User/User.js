@@ -1,10 +1,16 @@
 import { Title } from '../Title';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Theme } from '../Admin/UserList';
 import { api } from '../../utils';
+import { ErrorMessage } from '../ErrorMessage';
+import { setAccount } from '../../store/AuthenticateSlice';
+import { Input } from '../Input';
+import { ActionButton } from '../ActionButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const Container = styled.div`
   display: flex;
@@ -13,27 +19,37 @@ const Container = styled.div`
   justify-content: center;
   width: 100%;
 
-  > div {
+  > .truc {
     width: max-content;
-    margin-top: 5rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    > div {
+      display: grid;
+      grid-template-columns: auto auto;
+    }
   }
 `;
 
-// là où il est appelé (Accueil.js), il ne reçoit pas de props => getThemes, themes, updateUser sera toujours undefined
+const Line = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 1rem 0;
+  > * {
+    margin-right: 1rem;
+  }
+`;
 
-// récupère les fonctions dans le côté admin, par contre les routes ne sont pas les mêmes (appeler les routes côté utilisateur et pas admin)
 export const User = () => {
   const auth = useSelector(state => state.auth);
   const redirect = useNavigate();
-
+  const dispatch = useDispatch();
   const [user, setUser] = useState({});
-  const [email, setEmail] = useState(user.email);
+  const [email, setEmail] = useState('');
   const theme = useSelector(state => state.theme);
   const [themes, setThemes] = useState([]);
-  const [chosenThemes, setChosenThemes] = useState(user.themes);
+  const [chosenThemes, setChosenThemes] = useState([]);
   const [unchosenThemes, setUnchosenThemes] = useState([]);
   const [loading, setLoading] = useState({
     all: true,
@@ -43,16 +59,18 @@ export const User = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    getThemes();
+    getThemes().then();
   }, []);
 
   useEffect(() => {
-    if (JSON.stringify(chosenThemes) === JSON.stringify(user.themes)) return;
-    updateUser(user.id, user.email, chosenThemes);
-    setUnchosenThemes(
-      themes.filter(t => !chosenThemes.find(ct => ct.id === t.id))
-    );
-  }, [chosenThemes]);
+    if (auth.account === null) {
+      redirect('/login');
+      return;
+    }
+    setUser(auth.account);
+    setEmail(auth.account.email);
+    setChosenThemes(auth.account.themes ?? []);
+  }, [auth.account]);
 
   useEffect(() => {
     setUnchosenThemes(
@@ -61,20 +79,36 @@ export const User = () => {
   }, [themes, chosenThemes]);
 
   useEffect(() => {
-    api('/user/get').then(setUser);
-  }, [auth]);
+    if (JSON.stringify(chosenThemes) === JSON.stringify(user.themes)) return;
+    updateUser().then(() => {
+      setUnchosenThemes(
+        themes.filter(t => !chosenThemes.find(ct => ct.id === t.id))
+      );
+    });
+  }, [chosenThemes]);
 
-  const updateUser = async (id, email, themes) => {
+  const updateUser = async () => {
+    if (email.length === 0 || loading.edit) return;
     try {
       await api('/user/update', {
-        id,
         email,
-        themes: themes.map(t => t.id),
+        themes: chosenThemes.map(t => t.id),
       });
-      user.themes = themes;
-      user.email = email;
+      dispatch(setAccount({ ...user, email, themes: chosenThemes }));
     } catch (e) {
-      setError(e.message);
+      setError(e.message ?? 'Une erreur est survenue');
+    }
+  };
+
+  const deleteUser = async () => {
+    try {
+      await api('/user/delete', {
+        email,
+      });
+      dispatch(setAccount(null));
+      redirect('/login');
+    } catch (e) {
+      setError(e.message ?? 'Une erreur est survenue');
     }
   };
 
@@ -86,21 +120,38 @@ export const User = () => {
     try {
       setThemes(await api('/theme/all'));
     } catch (e) {
-      setError(e.message);
+      setError(e.message ?? 'Une erreur est survenue');
     } finally {
       setLoading(o => ({ ...o, themes: false }));
     }
   };
 
-  if ((!auth.account && 'account' in auth) || auth.admin) redirect('/login');
+  if (!auth.account === null || auth.admin) redirect('/login');
 
   return (
     <Container>
-      <Title>User</Title>
-      <div>
-        <Title small border>
-          Themes choisis
-        </Title>
+      <Title>Votre inscription</Title>
+      <ErrorMessage message={error} />
+      <Line>
+        <Input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <ActionButton onClick={updateUser}>
+          <FontAwesomeIcon icon={faFloppyDisk} color={theme.color.text} />
+        </ActionButton>
+        <ActionButton onClick={deleteUser}>
+          <FontAwesomeIcon
+            icon={faTrash}
+            color={theme.color.error.background}
+          />
+        </ActionButton>
+      </Line>
+      <Title small border>
+        Themes choisis
+      </Title>
+      <div className={'truc'}>
         {chosenThemes.map(t => (
           <Theme
             key={t.id}
@@ -111,9 +162,11 @@ export const User = () => {
             }
           />
         ))}
-        <Title small border>
-          Themes disponibles
-        </Title>
+      </div>
+      <Title small border>
+        Themes disponibles
+      </Title>
+      <div className={'truc'}>
         {unchosenThemes.map(t => (
           <Theme
             key={t.id}

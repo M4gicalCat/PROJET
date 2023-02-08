@@ -121,7 +121,6 @@ const Inscription = ({
   const handleEdit = e => {
     e.stopPropagation();
     if (edit) {
-      console.log('echo thames', inscription.themes);
       updateUser(inscription.id, email, inscription.themes);
     }
     inscription.email = email;
@@ -186,7 +185,10 @@ const Inscription = ({
             <FontAwesomeIcon
               color={theme.color.error.background}
               icon={faTrash}
-              onClick={() => deleteInscription(inscription.id)}
+              onClick={e => {
+                e.stopPropagation();
+                deleteInscription(inscription.id);
+              }}
             />
           </ActionButton>
         </div>
@@ -236,6 +238,8 @@ export const UserList = () => {
     edit: null,
   });
   const [error, setError] = useState('');
+  const [create, setCreate] = useState(false);
+  const [email, setEmail] = useState('');
 
   const getInscriptions = async () => {
     setError('');
@@ -265,7 +269,7 @@ export const UserList = () => {
     }
   };
 
-   const getThemes = async () => {
+  const getThemes = async () => {
     if (themes.length > 0 || loading.themes) return;
     setError('');
 
@@ -292,6 +296,17 @@ export const UserList = () => {
     }
   };
 
+  const createUser = async () => {
+    setError('');
+    try {
+      setCreate(false);
+      const inscription = await api('/admin/createInscription', { email });
+      setInscriptions(i => [...i, inscription]);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
   useEffect(() => {
     getInscriptions().then(() => {});
   }, []);
@@ -308,6 +323,7 @@ export const UserList = () => {
             icon={faPlusCircle}
             style={{ width: '1.5rem', height: '1.5rem' }}
             color={theme.color.text}
+            onClick={() => setCreate(true)}
           />
         </AB>
         {inscriptions.map(inscription => (
@@ -321,6 +337,30 @@ export const UserList = () => {
             loading={loading.edit === inscription.id}
           />
         ))}
+        {create && (
+          <List.Item.Head>
+            <Input
+              placeholder="Email"
+              value={email}
+              type="email"
+              onInput={e => setEmail(e.target.value)}
+            />
+            <AB onClick={createUser}>
+              <FontAwesomeIcon
+                icon={faFloppyDisk}
+                style={{ width: '1rem', height: '1rem' }}
+                color={theme.color.text}
+              />
+            </AB>
+            <AB onClick={() => setCreate(false)}>
+              <FontAwesomeIcon
+                icon={faTrash}
+                style={{ width: '1rem', height: '1rem' }}
+                color={theme.color.error.background}
+              />
+            </AB>
+          </List.Item.Head>
+        )}
       </List>
     </>
   );

@@ -14,13 +14,15 @@ Router::getRouter()->create('/user/get', function(?array $data = []) {
 
 Router::getRouter()->create("/user/update", function (?array $data = []) {
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
-    Inscription::update($_SESSION["email"], $data["email"]);
+    Inscription::update($_SESSION["id"], $data["email"], $data["themes"]);
     echo json_encode(["result" => "OK"]);
 }, AUTHENTICATION::$USER);
 
 Router::getRouter()->create('/user/delete', function () {
     require_once $_SERVER['DOCUMENT_ROOT'].'/src/Entities/Inscription.php';
     Inscription::delete($_SESSION['id']);
+    unset($_SESSION['email']);
+    unset($_SESSION['id']);
     echo json_encode(["result" => "OK"]);
 }, AUTHENTICATION::$USER);
 
